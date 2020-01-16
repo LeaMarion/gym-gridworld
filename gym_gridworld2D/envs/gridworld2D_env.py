@@ -199,7 +199,7 @@ class GridWorld2DEnv(gym.Env):
       # Check whether reward was found. Last step may get rewarded.
       self._time_step += 1
       #print(self._agent_pos)
-      if self._agent_pos == self._reward_pos:
+      if list(self._agent_pos) == self._reward_pos:
         reward = 1.
         done = True
       # Check whether maximum number of time steps has been reached.
