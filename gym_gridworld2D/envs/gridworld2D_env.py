@@ -143,7 +143,7 @@ class GridWorld2DEnv(gym.Env):
 
     elif self.start == 'ring':
       self.starting_positions = self.generating_starting_positions_ring(self.ring_size)
-      print(self.starting_positions)
+
 
     elif self.start == 'random':
       self.starting_positions = self.generating_starting_positions_random()
@@ -198,7 +198,6 @@ class GridWorld2DEnv(gym.Env):
 
       # Check whether reward was found. Last step may get rewarded.
       self._time_step += 1
-      #print(self._agent_pos)
       if list(self._agent_pos) == self._reward_pos:
         reward = 1.
         done = True
@@ -217,7 +216,6 @@ class GridWorld2DEnv(gym.Env):
 
       if not self.hardmode:
         observation = self.simplify_observation()
-      print(observation)
 
       return (observation, reward, done)
 
@@ -299,9 +297,7 @@ class GridWorld2DEnv(gym.Env):
       walls = np.array(self._walls_coord)
       walls = list(map(tuple, walls))
     start_pos = self._agent_pos
-    print(self._agent_pos)
     end_pos = self._reward_pos
-    print(self._reward_pos)
     # Runs the A* algorithm.
     if end_pos != start_pos:
       a_star_alg = AStar()
@@ -458,7 +454,6 @@ class GridWorld2DEnv(gym.Env):
         ring2 = corner - (-1)**i*np.array([k,0])
         if ring[0] < self._grid_size[0] and ring[0] >= 0 and ring[1] < self._grid_size[1] and ring[1]>=0:
           if ring is not self._walls_coord:
-            print(self._agent_pos)
             self._agent_pos = list(ring)
             # Check whether there exists a path to the reward if required.
             if self.get_optimal_path() is not None:
