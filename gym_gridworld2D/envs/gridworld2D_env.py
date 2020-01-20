@@ -217,6 +217,7 @@ class GridWorld2DEnv(gym.Env):
 
       if not self.hardmode:
         observation = self.simplify_observation()
+      print(observation)
 
       return (observation, reward, done)
 
@@ -281,8 +282,8 @@ class GridWorld2DEnv(gym.Env):
     Returns:
         observation (list): The simplified observation.
     """
-
-    return self._agent_pos
+    pos = np.array(self._agent_pos)
+    return pos
 
   def get_optimal_path(self):
     """
