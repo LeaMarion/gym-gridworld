@@ -448,20 +448,20 @@ class GridWorld2DEnv(gym.Env):
       if corner[0] < self._grid_size[0] and corner[0] >= 0 and corner[1] < self._grid_size[1] and corner[1]>=0:
         self._agent_pos = list(corner)
         if self.get_optimal_path() is not None:
-          self.starting_positions.append(corner)
-      for k in range(1,2*ring_size):
-        ring = corner - (-1)**i*np.array([0,k])
-        ring2 = corner - (-1)**i*np.array([k,0])
+          self.starting_positions.append(list(corner))
+      for k in range(1,2*ring_size+1):
+        ring = list(corner - (-1)**i*np.array([0,k]))
+        ring2 = list(corner - (-1)**i*np.array([k,0]))
         if ring[0] < self._grid_size[0] and ring[0] >= 0 and ring[1] < self._grid_size[1] and ring[1]>=0:
-          if ring is not self._walls_coord:
-            self._agent_pos = list(ring)
+          if ring not in self._walls_coord and ring not in self.starting_positions:
+            self._agent_pos = ring
             # Check whether there exists a path to the reward if required.
             if self.get_optimal_path() is not None:
               self.starting_positions.append(ring)
 
         if ring2[0] < self._grid_size[0] and ring2[0] >= 0 and ring2[1] < self._grid_size[1] and ring2[1] >= 0:
-          if ring2 is not self._walls_coord:
-            self._agent_pos = list(ring2)
+          if ring2 not in self._walls_coord and ring2 not in self.starting_positions:
+            self._agent_pos = ring2
             # Check whether there exists a path to the reward if required.
             if self.get_optimal_path() is not None:
               self.starting_positions.append(ring2)

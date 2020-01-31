@@ -28,4 +28,5 @@ for i in range(10):
     env.render()
     while not done:
         (observation, reward, done) = env.step(np.random.choice(range(4)))
+        print(observation)
         env.render()
