@@ -11,7 +11,7 @@ from gym_subgridworld.utils.a_star_path_finding import AStar
 class GridWorld2DEnv(gym.Env):
   metadata = {'render.modes': ['human']}
 
-  def __init__(self, hardmode = False, random_grid=False, valid_grid=False, valid_path=False,  start = 'ring', **kwargs):
+  def __init__(self, hardmode = False, random_grid=False, valid_grid=False, valid_path=False, **kwargs):
     """
     This environment is a N x M gridworld with walls.
     The agent perceives the world w/o walls and its position in it.
@@ -70,6 +70,8 @@ class GridWorld2DEnv(gym.Env):
       setattr(self, '_max_steps', 0)
     if 'walls_coord' in kwargs and type(kwargs['walls_coord']) is list:
       setattr(self, '_walls_coord', kwargs['walls_coord'])
+    if 'start' in kwargs and type(kwargs['start']) is str:
+      setattr(self, 'start',kwargs['start'])
     else:
       setattr(self, '_walls_coord', [])
 
@@ -86,15 +88,14 @@ class GridWorld2DEnv(gym.Env):
       raise ValueError('The reward is located in a wall: ' +
                        f'{self._reward_pos}.')
 
-    self.start = start
-
     if 'ring_size' in kwargs:
       if self.start is not 'ring':
-        raise Warning('You chose a particular ring_size but do not have the corresponding start')
+        raise Warning('You chose a particular ring_size but do not have the corresponding start-condition')
       if type(kwargs['ring_size']) is int:
         setattr(self, 'ring_size', kwargs['ring_size'])
     else:
       setattr(self, 'ring_size', 2)
+
 
     #set of posible starting pos
 
@@ -142,8 +143,10 @@ class GridWorld2DEnv(gym.Env):
       self.starting_positions.append(self._agent_pos)
 
     elif self.start == 'ring':
-      self.starting_positions = self.generating_starting_positions_ring(self.ring_size)
+      self.starting_positions = self.generating_starting_positions_ring()
 
+    elif self.start == 'all':
+      self.starting_positions = self.generating_starting_positions_all()
 
     elif self.start == 'random':
       self.starting_positions = self.generating_starting_positions_random()
@@ -442,14 +445,14 @@ class GridWorld2DEnv(gym.Env):
           else:
             self._invalid_pos.append([i,j])
 
-  def generating_starting_positions_ring(self,ring_size):
+  def generating_starting_positions_ring(self):
     for i in range(2):
-      corner = np.array(np.array(self._reward_pos)+np.array([(-1)**i*ring_size,(-1)**i*ring_size]))
+      corner = np.array(np.array(self._reward_pos)+np.array([(-1)**i*self.ring_size,(-1)**i*self.ring_size]))
       if corner[0] < self._grid_size[0] and corner[0] >= 0 and corner[1] < self._grid_size[1] and corner[1]>=0:
         self._agent_pos = list(corner)
         if self.get_optimal_path() is not None:
           self.starting_positions.append(list(corner))
-      for k in range(1,2*ring_size+1):
+      for k in range(1,2*self.ring_size+1):
         ring = list(corner - (-1)**i*np.array([0,k]))
         ring2 = list(corner - (-1)**i*np.array([k,0]))
         if ring[0] < self._grid_size[0] and ring[0] >= 0 and ring[1] < self._grid_size[1] and ring[1]>=0:
@@ -466,6 +469,15 @@ class GridWorld2DEnv(gym.Env):
             if self.get_optimal_path() is not None:
               self.starting_positions.append(ring2)
     return self.starting_positions
+
+  def generating_starting_positions_all(self):
+    for i in range(self._grid_size[0]):
+      for j in range(self._grid_size[1]):
+        new_element = [i,j]
+        if new_element not in self._walls_coord and new_element!=self._reward_pos:
+          self.starting_positions.append(new_element)
+    return self.starting_positions
+
 
   def generating_starting_positions_random(self):
     return []
